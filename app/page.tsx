@@ -25,11 +25,15 @@ export default function Home() {
         rpcUrl: "https://api.stg.cyberconnect.dev/cyberaccount/bundler/v1/rpc",
         appId: "ab23459a-32d7-4235-8129-77bd5de27fb1",
       });
-      const ownerAddress = "0x5654Eb8753097f833Ea1d2bbD88D1902ba3BbFBc";
       const walletClient = createWalletClient({
         chain: optimismGoerli,
-        transport: custom((window as unknown as { ethereum: any }).ethereum),
+        transport: custom(window.ethereum),
       });
+
+      const accounts = await walletClient.requestAddresses();
+
+      const ownerAddress = accounts[0];
+
       const signMessage = async (userOperationHash: Hex) => {
         return await walletClient.signMessage({
           account: ownerAddress,
