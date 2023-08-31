@@ -11,6 +11,7 @@ import {
   custom,
   hexToBytes,
   type Hash,
+  type Hex,
 } from "viem";
 import { mainnet, optimismGoerli } from "viem/chains";
 import { ethers } from "ethers";
@@ -20,61 +21,31 @@ export default function Home() {
 
   React.useEffect(() => {
     (async () => {
-      const walletClient = createWalletClient({
-        chain: optimismGoerli,
-        transport: custom((window as any).ethereum),
-      });
-
-      const sign = async (message: Hash) => {
-        console.log("signing message", message);
-        return await walletClient.signMessage({
-          account: "0x370CA01D7314e3EEa59d57E343323bB7e9De24C6",
-          message: { raw: message },
-        });
-      };
-
-      const provider = new ethers.BrowserProvider((window as any).ethereum);
-      const signer = await provider.getSigner();
-
-      const signx = async (message: Hash) => {
-        const resx = await signer.signMessage(hexToBytes(message));
-        console.log("resx", resx);
-        return resx;
-      };
-
-      console.log("signer", signer.signMessage);
-
-      // jwt: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZW5kZXIiOiIweDBmNDMyOEE2OEE4ZjBhNWExYzdkQmQ5MkExRDAyZjM0NDE5MzdEMjgiLCJhaWQiOiJhYjIzNDU5YS0zMmQ3LTQyMzUtODEyOS03N2JkNWRlMjdmYjEiLCJpc3MiOiJDeWJlckNvbm5lY3QiLCJleHAiOjIwMDg2NTU2MzksImlhdCI6MTY5MzI5NTYzOX0.kRneNtMAR84CCpo-VXnrMwLhQXTphPVEA_4wp-QN-qXKxPscLy3ZNS2JnDMmPVhJgkroOscZWFvTb0YfjZOwXQ",
-
-      const generateJwt = async () => {
-        console.log("fetching gwt");
-        return "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZW5kZXIiOiIweDBmNDMyOEE2OEE4ZjBhNWExYzdkQmQ5MkExRDAyZjM0NDE5MzdEMjgiLCJhaWQiOiJhYjIzNDU5YS0zMmQ3LTQyMzUtODEyOS03N2JkNWRlMjdmYjEiLCJpc3MiOiJDeWJlckNvbm5lY3QiLCJleHAiOjIwMDg2NTU2MzksImlhdCI6MTY5MzI5NTYzOX0.kRneNtMAR84CCpo-VXnrMwLhQXTphPVEA_4wp-QN-qXKxPscLy3ZNS2JnDMmPVhJgkroOscZWFvTb0YfjZOwXQ";
-      };
-      const cyberPaymaster = new CyberPaymaster({
-        rpcUrl:
-          "https://api.stg.cyberconnect.dev/cyberaccount/paymaster/v1/rpc",
-        appId: "ab23459a-32d7-4235-8129-77bd5de27fb1",
-        generateJwt: generateJwt,
-      });
-
       const cyberBundler = new CyberBundler({
         rpcUrl: "https://api.stg.cyberconnect.dev/cyberaccount/bundler/v1/rpc",
         appId: "ab23459a-32d7-4235-8129-77bd5de27fb1",
       });
-
+      const ownerAddress = "0x5654Eb8753097f833Ea1d2bbD88D1902ba3BbFBc";
+      const walletClient = createWalletClient({
+        chain: optimismGoerli,
+        transport: custom((window as unknown as { ethereum: any }).ethereum),
+      });
+      const signMessage = async (userOperationHash: Hex) => {
+        return await walletClient.signMessage({
+          account: ownerAddress,
+          message: { raw: userOperationHash }, // pass the UO hash as a raw message
+        });
+      };
       const cyberAccount = new CyberAccount({
-        owner: {
-          address: "0x370CA01D7314e3EEa59d57E343323bB7e9De24C6",
-          signMessage: sign,
-        },
         chain: {
           id: 420,
           testnet: true,
-          rpcUrl:
-            "https://opt-goerli.g.alchemy.com/v2/4Zf2nuIda3juEnEvhNy-CSzljtU2FKuy",
+        },
+        owner: {
+          address: ownerAddress,
+          signMessage,
         },
         bundler: cyberBundler,
-        // paymaster: cyberPaymaster,
       });
 
       setCyberAccount(cyberAccount);
@@ -82,20 +53,11 @@ export default function Home() {
   }, []);
 
   const handleClick = async () => {
-    cyberAccount
-      ?.sendTransaction(
-        {
-          to: "0xe06d90913Cb563c2Ca208ea079F5e2D10B6D760D",
-          value: parseUnits("0.00000042069", 18),
-          data: "0x",
-        }
-        // {
-        //   disablePaymaster: true,
-        // }
-      )
-      .catch((e) => {
-        alert(e.message);
-      });
+    await cyberAccount?.sendTransaction({
+      to: "0xe06d90913Cb563c2Ca208ea079F5e2D10B6D760D",
+      value: parseUnits("0", 18),
+      data: "0x",
+    });
   };
 
   const list = async () => {
