@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -63,6 +64,7 @@ export default function Page() {
   const to = watch("to");
   const amount = watch("amount");
   const tokenAddress = watch("token");
+  const enablePaymaster = watch("enablePaymaster");
 
   React.useEffect(() => {
     setSelectedChain(
@@ -177,7 +179,9 @@ export default function Page() {
       }
       setTransaction(transaction);
 
-      uoHash = await cyberAccount.sendTransaction(transaction);
+      uoHash = await cyberAccount.sendTransaction(transaction, {
+        disablePaymaster: !enablePaymaster,
+      });
 
       let txHash: any | undefined;
 
@@ -282,6 +286,21 @@ export default function Page() {
           <CardContent>
             <Separator className="my-4" />
             <div className="flex flex-col gap-y-4">
+              <div className="flex items-center space-x-2">
+                <Controller
+                  name="enablePaymaster"
+                  control={control}
+                  defaultValue={true}
+                  render={({ field }) => (
+                    <Switch
+                      {...field}
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  )}
+                />
+                <Label htmlFor="pm-mode">Enable Paymaster</Label>
+              </div>
               <div>
                 <Label htmlFor="to">Send to</Label>
                 <Input placeholder="Address" {...register("to")} />
@@ -343,6 +362,7 @@ export default function Page() {
                     chianId: cyberAccount?.chain.id,
                     address: cyberAccount?.address,
                     owner: cyberAccount?.owner.address,
+                    enablePaymaster: enablePaymaster,
                   },
                   transaction,
                 }}
