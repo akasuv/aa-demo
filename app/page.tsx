@@ -263,7 +263,7 @@ export default function Page() {
                         </SelectTrigger>
                         <SelectContent position="popper">
                           {supportedChains.map((chain) => (
-                            <SelectItem value={chain.id + ""}>
+                            <SelectItem key={chain.id} value={chain.id + ""}>
                               {chain.name}
                             </SelectItem>
                           ))}
@@ -304,7 +304,10 @@ export default function Page() {
                           {selectedChain?.nativeCurrency.symbol}
                         </SelectItem>
                         {selectedChain?.erc20List?.map((chain: any) => (
-                          <SelectItem value={chain.address + ""}>
+                          <SelectItem
+                            key={chain.address}
+                            value={chain.address + ""}
+                          >
                             {chain.symbol}
                           </SelectItem>
                         ))}
