@@ -214,61 +214,122 @@ export default function Page() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} onReset={handleReset}>
-      <main className="mt-8 flex gap-x-8 justify-center">
-        <Card className="w-[500px] h-fit">
-          <CardHeader>
-            <div className="mb-4">
-              <CardTitle>CyberAccount</CardTitle>
-              <div>
-                <Button variant="link" className="p-0 h-fit">
-                  <Link
-                    href={
-                      selectedChain?.blockExplorers.default.url +
-                      "/address/" +
-                      cyberAccount?.address
-                    }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {cyberAccount?.address}
-                  </Link>
-                </Button>
+    <div className="flex flex-col items-center gap-y-4 pt-12">
+      <h1 className="text-4xl font-black">CyberAccount Playground</h1>
+      <form onSubmit={handleSubmit(onSubmit)} onReset={handleReset}>
+        <main className="mt-8 flex gap-x-8 justify-center">
+          <Card className="w-[500px] h-fit">
+            <CardHeader>
+              <div className="mb-4">
+                <CardTitle>CyberAccount</CardTitle>
+                <div>
+                  <Button variant="link" className="p-0 h-fit">
+                    <Link
+                      href={
+                        selectedChain?.blockExplorers.default.url +
+                        "/address/" +
+                        cyberAccount?.address
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {cyberAccount?.address}
+                    </Link>
+                  </Button>
+                </div>
+                <div className="flex flex-row items-center gap-2 mt-2">
+                  <Badge className="text-xs font-normal">Owner</Badge>
+                  <Button variant="link" className="p-0 text-xs h-fit">
+                    <Link
+                      href={
+                        selectedChain?.blockExplorers.default.url +
+                        "/address/" +
+                        cyberAccount?.owner.address
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {cyberAccount?.owner.address}
+                    </Link>
+                  </Button>
+                </div>
               </div>
-              <div className="flex flex-row items-center gap-2 mt-2">
-                <Badge className="text-xs font-normal">Owner</Badge>
-                <Button variant="link" className="p-0 text-xs h-fit">
-                  <Link
-                    href={
-                      selectedChain?.blockExplorers.default.url +
-                      "/address/" +
-                      cyberAccount?.owner.address
-                    }
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {cyberAccount?.owner.address}
-                  </Link>
-                </Button>
+              <div className="flex justify-between">
+                <div className="grid w-1/2 items-center gap-4">
+                  <div className="flex flex-col space-y-1.5">
+                    <Label htmlFor="network">Network</Label>
+                    <Controller
+                      name="chainId"
+                      control={control}
+                      defaultValue="420"
+                      render={({ field }) => (
+                        <Select {...field} onValueChange={field.onChange}>
+                          <SelectTrigger id="chainId">
+                            <SelectValue placeholder="Select a chain" />
+                          </SelectTrigger>
+                          <SelectContent position="popper">
+                            {supportedChains.map((chain) => (
+                              <SelectItem key={chain.id} value={chain.id + ""}>
+                                {chain.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <p className="text-md font-semibold">Gas Credit</p>
+                  <p className="text-right">$ {gasCredit}</p>
+                </div>
               </div>
-            </div>
-            <div className="flex justify-between">
-              <div className="grid w-1/2 items-center gap-4">
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="network">Network</Label>
+            </CardHeader>
+            <CardContent>
+              <Separator className="my-4" />
+              <div className="flex flex-col gap-y-4">
+                <div className="flex items-center space-x-2">
                   <Controller
-                    name="chainId"
+                    name="enablePaymaster"
                     control={control}
-                    defaultValue="420"
+                    defaultValue={true}
+                    render={({ field }) => (
+                      <Switch
+                        {...field}
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    )}
+                  />
+                  <Label htmlFor="pm-mode">Enable Paymaster</Label>
+                </div>
+                <div>
+                  <Label htmlFor="to">Send to</Label>
+                  <Input placeholder="Address" {...register("to")} />
+                </div>
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="token">Token</Label>
+                  <Controller
+                    name="token"
+                    control={control}
+                    // defaultValue=
                     render={({ field }) => (
                       <Select {...field} onValueChange={field.onChange}>
-                        <SelectTrigger id="chainId">
-                          <SelectValue placeholder="Select a chain" />
+                        <SelectTrigger id="token">
+                          <SelectValue placeholder="Select a token" />
                         </SelectTrigger>
                         <SelectContent position="popper">
-                          {supportedChains.map((chain) => (
-                            <SelectItem key={chain.id} value={chain.id + ""}>
-                              {chain.name}
+                          <SelectItem
+                            value={"0x0000000000000000000000000000000000000000"}
+                          >
+                            {selectedChain?.nativeCurrency.symbol}
+                          </SelectItem>
+                          {selectedChain?.erc20List?.map((chain: any) => (
+                            <SelectItem
+                              key={chain.address}
+                              value={chain.address + ""}
+                            >
+                              {chain.symbol}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -276,130 +337,72 @@ export default function Page() {
                     )}
                   />
                 </div>
-              </div>
-              <div className="flex flex-col gap-1">
-                <p className="text-md font-semibold">Gas Credit</p>
-                <p className="text-right">$ {gasCredit}</p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <Separator className="my-4" />
-            <div className="flex flex-col gap-y-4">
-              <div className="flex items-center space-x-2">
-                <Controller
-                  name="enablePaymaster"
-                  control={control}
-                  defaultValue={true}
-                  render={({ field }) => (
-                    <Switch
-                      {...field}
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  )}
-                />
-                <Label htmlFor="pm-mode">Enable Paymaster</Label>
-              </div>
-              <div>
-                <Label htmlFor="to">Send to</Label>
-                <Input placeholder="Address" {...register("to")} />
-              </div>
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="token">Token</Label>
-                <Controller
-                  name="token"
-                  control={control}
-                  // defaultValue=
-                  render={({ field }) => (
-                    <Select {...field} onValueChange={field.onChange}>
-                      <SelectTrigger id="token">
-                        <SelectValue placeholder="Select a token" />
-                      </SelectTrigger>
-                      <SelectContent position="popper">
-                        <SelectItem
-                          value={"0x0000000000000000000000000000000000000000"}
-                        >
-                          {selectedChain?.nativeCurrency.symbol}
-                        </SelectItem>
-                        {selectedChain?.erc20List?.map((chain: any) => (
-                          <SelectItem
-                            key={chain.address}
-                            value={chain.address + ""}
-                          >
-                            {chain.symbol}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </div>
-              <div>
-                <Label htmlFor="to">Amount</Label>
-                <Input placeholder="Amount" {...register("amount")} />
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="outline" type="reset">
-              Reset
-            </Button>
-            <Button type="submit">
-              {isWaiting ? "Waiting..." : "Confirm"}
-            </Button>
-          </CardFooter>
-        </Card>
-        <div className="flex flex-col gap-y-4">
-          <Card className="w-full h-fit">
-            <CardHeader>
-              <CardTitle>Transaction Detail</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <JsonViewer
-                value={{
-                  cyberAccount: {
-                    chianId: cyberAccount?.chain.id,
-                    address: cyberAccount?.address,
-                    owner: cyberAccount?.owner.address,
-                    enablePaymaster: enablePaymaster,
-                  },
-                  transaction,
-                }}
-              />
-            </CardContent>
-          </Card>
-          <Card className="h-fit">
-            <CardHeader>
-              <CardTitle>Transaction Result</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {txHash ? (
-                <div className="flex gap-x-2 items-center">
-                  <Badge className="text-xs font-normal">Hash</Badge>
-                  <Button variant="link" className="p-0 h-fit">
-                    <Link
-                      href={
-                        selectedChain?.blockExplorers.default.url +
-                        "/tx/" +
-                        txHash
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {txHash}
-                    </Link>
-                  </Button>
+                <div>
+                  <Label htmlFor="to">Amount</Label>
+                  <Input placeholder="Amount" {...register("amount")} />
                 </div>
-              ) : isWaiting ? (
-                <p>Waiting for transaction...</p>
-              ) : (
-                <p>None</p>
-              )}
+              </div>
             </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button variant="outline" type="reset">
+                Reset
+              </Button>
+              <Button type="submit">
+                {isWaiting ? "Waiting..." : "Confirm"}
+              </Button>
+            </CardFooter>
           </Card>
-        </div>
-      </main>
-    </form>
+          <div className="flex flex-col gap-y-4">
+            <Card className="w-full h-fit">
+              <CardHeader>
+                <CardTitle>Transaction Detail</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <JsonViewer
+                  value={{
+                    cyberAccount: {
+                      chianId: cyberAccount?.chain.id,
+                      address: cyberAccount?.address,
+                      owner: cyberAccount?.owner.address,
+                      enablePaymaster: enablePaymaster,
+                    },
+                    transaction,
+                  }}
+                />
+              </CardContent>
+            </Card>
+            <Card className="h-fit">
+              <CardHeader>
+                <CardTitle>Transaction Result</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {txHash ? (
+                  <div className="flex gap-x-2 items-center">
+                    <Badge className="text-xs font-normal">Hash</Badge>
+                    <Button variant="link" className="p-0 h-fit">
+                      <Link
+                        href={
+                          selectedChain?.blockExplorers.default.url +
+                          "/tx/" +
+                          txHash
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {txHash}
+                      </Link>
+                    </Button>
+                  </div>
+                ) : isWaiting ? (
+                  <p>Waiting for transaction...</p>
+                ) : (
+                  <p>None</p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </form>
+    </div>
   );
 }
