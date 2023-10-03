@@ -1,6 +1,9 @@
 lockfileVersion: '6.0'
 
 dependencies:
+  '@cyberlab/cyber-account':
+    specifier: ^1.9.7
+    version: 1.9.7(typescript@5.2.2)
   '@emotion/react':
     specifier: ^11.11.1
     version: 11.11.1(@types/react@18.2.21)(react@18.2.0)
@@ -199,6 +202,17 @@ packages:
       - encoding
       - supports-color
       - utf-8-validate
+    dev: false
+
+  /@cyberlab/cyber-account@1.9.7(typescript@5.2.2):
+    resolution: {integrity: sha512-yin3z4uRfY/rtUMqfOFdWpxiCvqiQEXREDuBiU0kjvKSGBVLsZfC4nANlIIkBROQ9NAjQiJ4pZpCPxwHfo26LQ==}
+    dependencies:
+      viem: 1.9.2(typescript@5.2.2)
+    transitivePeerDependencies:
+      - bufferutil
+      - typescript
+      - utf-8-validate
+      - zod
     dev: false
 
   /@emotion/babel-plugin@11.11.0:
