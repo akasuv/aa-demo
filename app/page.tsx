@@ -196,8 +196,7 @@ export default function Page() {
         setTxHash(txHash);
       }
     } catch (error) {
-      reset();
-      alert("An error occurred, form reset.");
+      alert("An error occurred: " + JSON.stringify(error, null, 2));
     } finally {
       setIsWaiting(false);
     }
