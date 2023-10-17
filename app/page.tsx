@@ -65,6 +65,7 @@ export default function Page() {
   const amount = watch("amount");
   const tokenAddress = watch("token");
   const enablePaymaster = watch("enablePaymaster");
+  const enableBatch = watch("enableBatch");
 
   React.useEffect(() => {
     setSelectedChain(
@@ -86,7 +87,7 @@ export default function Page() {
         appId: "ab23459a-32d7-4235-8129-77bd5de27fb1",
         generateJwt: () =>
           Promise.resolve(
-            "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZW5kZXIiOiIweDBmNDMyOEE2OEE4ZjBhNWExYzdkQmQ5MkExRDAyZjM0NDE5MzdEMjgiLCJhaWQiOiJhYjIzNDU5YS0zMmQ3LTQyMzUtODEyOS03N2JkNWRlMjdmYjEiLCJpc3MiOiJDeWJlckNvbm5lY3QiLCJleHAiOjIwMDg2NTU2MzksImlhdCI6MTY5MzI5NTYzOX0.kRneNtMAR84CCpo-VXnrMwLhQXTphPVEA_4wp-QN-qXKxPscLy3ZNS2JnDMmPVhJgkroOscZWFvTb0YfjZOwXQ",
+            `eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZW5kZXIiOiIweDAzM2IyRjllNjEyQjNkNjMzNTM3REFBOTM2NzNiRkIwRDVFZjBGNkEiLCJhaWQiOiJhYjIzNDU5YS0zMmQ3LTQyMzUtODEyOS03N2JkNWRlMjdmYjEiLCJpc3MiOiJDeWJlckNvbm5lY3QiLCJleHAiOjIwMTI3OTYwOTIsImlhdCI6MTY5NzQzNjA5Mn0.BDOmelbMuvZr8aNhdZAFE0q5OExKireMH3tMt3qzjTY8SswjymJ5E9cu5_nYTwkVtHZoRuuhEIyoDqtYeJROCg`,
           ),
       });
 
@@ -121,6 +122,8 @@ export default function Page() {
         chain: {
           id: chainId,
           testnet: true,
+          rpcUrl:
+            "https://polygon-mumbai.g.alchemy.com/v2/4Zf2nuIda3juEnEvhNy-CSzljtU2FKuy",
         },
         owner: {
           address: ownerAddress,
@@ -179,9 +182,12 @@ export default function Page() {
       }
       setTransaction(transaction);
 
-      uoHash = await cyberAccount.sendTransaction(transaction, {
-        disablePaymaster: !enablePaymaster,
-      });
+      uoHash = await cyberAccount.sendTransaction(
+        enableBatch ? [transaction, transaction, transaction] : transaction,
+        {
+          disablePaymaster: !enablePaymaster,
+        },
+      );
 
       let txHash: any | undefined;
 
@@ -287,21 +293,44 @@ export default function Page() {
             <CardContent>
               <Separator className="my-4" />
               <div className="flex flex-col gap-y-4">
-                <div className="flex items-center space-x-2">
-                  <Controller
-                    name="enablePaymaster"
-                    control={control}
-                    defaultValue={true}
-                    render={({ field }) => (
-                      <Switch
-                        {...field}
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    )}
-                  />
-                  <Label htmlFor="pm-mode">Enable Paymaster</Label>
+                <div className="flex gap-x-4">
+                  <div className="flex items-center space-x-2">
+                    <Controller
+                      name="enableBatch"
+                      control={control}
+                      defaultValue={true}
+                      render={({ field }) => (
+                        <Switch
+                          {...field}
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      )}
+                    />
+                    <Label htmlFor="pm-mode">Batch</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Controller
+                      name="enablePaymaster"
+                      control={control}
+                      defaultValue={true}
+                      render={({ field }) => (
+                        <Switch
+                          {...field}
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      )}
+                    />
+                    <Label htmlFor="pm-mode">Enable Paymaster</Label>
+                  </div>
                 </div>
+                {enableBatch && (
+                  <p className="text-sm text-gray-500">
+                    Batch transactions enabled, will send 3 of the same
+                    transactions.
+                  </p>
+                )}
                 <div>
                   <Label htmlFor="to">Send to</Label>
                   <Input placeholder="Address" {...register("to")} />
@@ -364,8 +393,11 @@ export default function Page() {
                       address: cyberAccount?.address,
                       owner: cyberAccount?.owner.address,
                       enablePaymaster: enablePaymaster,
+                      enableBatch: enableBatch,
                     },
-                    transaction,
+                    transaction: enableBatch
+                      ? [transaction, transaction, transaction]
+                      : transaction,
                   }}
                 />
               </CardContent>

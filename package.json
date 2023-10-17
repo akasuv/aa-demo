@@ -9,7 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@cyberlab/cyber-account": "^1.9.7",
+    "@cyberlab/cyber-account": "2.1.0-beta.1",
+    "@cyberlab/cyber-app-sdk": "^1.2.4",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.14.11",
