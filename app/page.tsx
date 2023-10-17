@@ -298,7 +298,7 @@ export default function Page() {
                     <Controller
                       name="enableBatch"
                       control={control}
-                      defaultValue={true}
+                      defaultValue={false}
                       render={({ field }) => (
                         <Switch
                           {...field}
