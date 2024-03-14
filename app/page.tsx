@@ -59,6 +59,8 @@ export default function Page() {
   const [txHash, setTxHash] = React.useState<string>();
   const [isWaiting, setIsWaiting] = React.useState(false);
   const [transaction, setTransaction] = React.useState<any>();
+  const [jwt, setJwt] = React.useState<string>("");
+  const [appId, setAppId] = React.useState<string>("");
 
   const chainId = watch("chainId");
   const to = watch("to");
@@ -75,6 +77,10 @@ export default function Page() {
 
   React.useEffect(() => {
     (async () => {
+      if (!jwt || !appId) {
+        return;
+      }
+
       const cyberBundler = new CyberBundler({
         rpcUrl: "https://api.stg.cyberconnect.dev/cyberaccount/bundler/v1/rpc",
         appId: "ab23459a-32d7-4235-8129-77bd5de27fb1",
@@ -84,17 +90,14 @@ export default function Page() {
       const cyberPaymaster = new CyberPaymaster({
         rpcUrl:
           "https://api.stg.cyberconnect.dev/cyberaccount/paymaster/v1/rpc",
-        appId: "ab23459a-32d7-4235-8129-77bd5de27fb1",
-        generateJwt: () =>
-          Promise.resolve(
-            `eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZW5kZXIiOiIweDAzM2IyRjllNjEyQjNkNjMzNTM3REFBOTM2NzNiRkIwRDVFZjBGNkEiLCJhaWQiOiJhYjIzNDU5YS0zMmQ3LTQyMzUtODEyOS03N2JkNWRlMjdmYjEiLCJpc3MiOiJDeWJlckNvbm5lY3QiLCJleHAiOjIwMTI3OTYwOTIsImlhdCI6MTY5NzQzNjA5Mn0.BDOmelbMuvZr8aNhdZAFE0q5OExKireMH3tMt3qzjTY8SswjymJ5E9cu5_nYTwkVtHZoRuuhEIyoDqtYeJROCg`,
-          ),
+        appId,
+        generateJwt: () => Promise.resolve(jwt),
       });
 
       setCyberBundler(cyberBundler);
       setCyberPaymaster(cyberPaymaster);
     })();
-  }, []);
+  }, [jwt, appId]);
 
   React.useEffect(() => {
     (async () => {
@@ -221,6 +224,23 @@ export default function Page() {
   return (
     <div className="flex flex-col items-center gap-y-4 pt-12">
       <h1 className="text-4xl font-black">CyberAccount Playground</h1>
+      <div className="w-1/4 flex flex-col gap-y-4">
+        <div className="flex items-center gap-x-4">
+          <Label htmlFor="appId" className="text-right w-[80px]">
+            App ID
+          </Label>
+          <Input
+            placeholder="App ID"
+            onChange={(e) => setAppId(e.target.value)}
+          />
+        </div>
+        <div className="flex items-center gap-x-4">
+          <Label htmlFor="jwt" className="text-right w-[80px]">
+            JWT
+          </Label>
+          <Input placeholder="jwt" onChange={(e) => setJwt(e.target.value)} />
+        </div>
+      </div>
       <form onSubmit={handleSubmit(onSubmit)} onReset={handleReset}>
         <main className="mt-8 flex gap-x-8 justify-center">
           <Card className="w-[500px] h-fit">

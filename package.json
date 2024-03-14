@@ -9,8 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@cyberlab/cyber-account": "2.1.0-beta.1",
-    "@cyberlab/cyber-app-sdk": "^1.2.4",
+    "@cyberlab/cyber-account": "2.1.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.14.11",
@@ -33,6 +32,7 @@
     "lucide-react": "^0.279.0",
     "next": "13.4.19",
     "postcss": "8.4.28",
+    "prettier": "^3.2.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.47.0",
